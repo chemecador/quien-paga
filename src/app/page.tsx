@@ -2,133 +2,121 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-2xl font-bold text-blue-600">QuienPaga</h1>
-            </div>
-            <div className="flex space-x-4">
-              <Link
-                href="/sign-in"
-                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Iniciar sesión
-              </Link>
-              <Link
-                href="/sign-up"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Registrarse
-              </Link>
-            </div>
-          </div>
+    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
+      <header className="bg-gradient-to-r from-blue-600 to-green-500 text-white shadow-md">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-extrabold">QuienPaga</h1>
+          <nav className="space-x-4">
+            <Link href="/sign-in" className="hover:underline">
+              Iniciar sesión
+            </Link>
+            <Link
+              href="/sign-up"
+              className="px-4 py-2 bg-white text-blue-600 rounded-lg shadow hover:shadow-lg"
+            >
+              Registrarse
+            </Link>
+          </nav>
         </div>
       </header>
 
-      <main className="flex-grow bg-gray-50">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-            <div>
-              <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
-                Gestiona gastos compartidos de forma sencilla
-              </h2>
-              <p className="mt-4 text-xl text-gray-500">
-                Dividir gastos entre amigos, familia o compañeros nunca fue tan
-                fácil. Crea grupos, añade gastos y deja que QuienPaga calcule
-                quién debe a quién.
-              </p>
-              <div className="mt-8">
-                <Link
-                  href="/sign-up"
-                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  Comenzar ahora
-                </Link>
-              </div>
-            </div>
-            <div className="mt-10 lg:mt-0">
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="px-6 py-8 sm:p-10">
-                  <h3 className="text-2xl font-semibold text-gray-900">
-                    ¿Cómo funciona?
-                  </h3>
-                  <ul className="mt-5 space-y-5">
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="h-6 w-6 text-green-500"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                      <p className="ml-3 text-base text-gray-700">
-                        Crea grupos para diferentes eventos o situaciones
-                      </p>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="h-6 w-6 text-green-500"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                      <p className="ml-3 text-base text-gray-700">
-                        Registra gastos y especifica quién pagó
-                      </p>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="h-6 w-6 text-green-500"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                      <p className="ml-3 text-base text-gray-700">
-                        Visualiza al instante quién debe a quién
-                      </p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+      <main className="flex-grow">
+        <section className="bg-gradient-to-b from-blue-50 to-white py-20">
+          <div className="max-w-6xl mx-auto text-center px-6">
+            <h2 className="text-5xl font-bold mb-4">
+              La forma más fácil de gestionar gastos
+            </h2>
+            <p className="text-xl mb-8">
+              ¿A quién le toca pagar hoy? Nuestro algoritmo calcula quién ha
+              pagado menos gastos y cuánto debe a cada uno.
+            </p>
+            <Link
+              href="/sign-up"
+              className="inline-block px-8 py-4 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700"
+            >
+              Empezar ahora
+            </Link>
           </div>
-        </div>
+        </section>
+
+        <section className="py-16">
+          <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 px-6">
+            {[
+              {
+                title: "Crear grupos",
+                desc: "Organiza los gastos de todo el viaje.",
+                icon: (
+                  <svg
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 7h18M3 12h18M3 17h18"
+                    />
+                  </svg>
+                ),
+              },
+              {
+                title: "Registrar pagos",
+                desc: "Añade quién pagó y cuánto gastó.",
+                icon: (
+                  <svg
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2"
+                    />
+                  </svg>
+                ),
+              },
+              {
+                title: "Resumen gráfico",
+                desc: "Visualiza cuánto ha pagado cada uno.",
+                icon: (
+                  <svg
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 17v-6h6v6m2 4H7a2 2 0 01-2-2V7a2 2 0 012-2h5l2 2h5a2 2 0 012 2v12a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                ),
+              },
+            ].map((f) => (
+              <div
+                key={f.title}
+                className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition"
+              >
+                <div className="text-blue-600 mb-4">{f.icon}</div>
+                <h3 className="text-xl font-semibold mb-2">{f.title}</h3>
+                <p className="text-gray-600">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
 
-      <footer className="bg-white">
-        <div className="max-w-7xl mx-auto py-6 px-4 overflow-hidden sm:px-6 lg:px-8">
-          <p className="text-center text-gray-400 text-sm">
-            &copy; 2025 QuienPaga. Todos los derechos reservados.
-          </p>
-        </div>
+      <footer className="bg-gray-100 py-6">
+        <p className="text-center text-gray-500 text-sm">
+          &copy; 2025 QuienPaga. Todos los derechos reservados.
+        </p>
       </footer>
     </div>
   );
