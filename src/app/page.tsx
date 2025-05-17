@@ -5,7 +5,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
       <header className="bg-gradient-to-r from-blue-600 to-green-500 text-white shadow-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-extrabold">QuienPaga</h1>
+          <h1 className="text-2xl text-white font-extrabold">QuienPaga</h1>
           <nav className="space-x-4">
             <Link href="/sign-in" className="hover:underline">
               Iniciar sesión
