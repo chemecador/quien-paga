@@ -2,6 +2,10 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { getUserGroups } from "@/lib/services/groupService";
+import { Group } from "@/lib/types";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -10,12 +14,7 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  interface Group {
-    id: string;
-    name: string;
-  }
-
-  const mockGroups: Group[] = [];
+  const groups: Group[] = await getUserGroups(user.id);
 
   return (
     <div className="p-6 bg-emerald-50 shadow-md rounded-lg">
@@ -64,39 +63,96 @@ export default async function DashboardPage() {
         <div className="bg-white shadow rounded-lg p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold">Mis grupos</h2>
-            <Link
-              href="/groups"
-              className="text-sm text-green-700 hover:text-green-900 flex items-center"
-            >
-              Ver todos
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-4 h-4 ml-1"
+            {groups.length > 0 && (
+              <Link
+                href="/groups"
+                className="text-sm text-green-700 hover:text-green-900 flex items-center"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                />
-              </svg>
-            </Link>
+                Ver todos
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4 ml-1"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                  />
+                </svg>
+              </Link>
+            )}
           </div>
 
-          {mockGroups && mockGroups.length > 0 ? (
+          {groups.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mockGroups.map((group) => (
-                <div
+              {groups.map((group) => (
+                <Link
                   key={group.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                  href={`/groups/${group.id}`}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow hover:bg-gray-50"
                 >
-                  <h3 className="font-medium truncate">{group.name}</h3>
-                  {/* Aquí irían los detalles del grupo */}
-                </div>
+                  <h3 className="font-medium text-lg truncate text-gray-800">
+                    {group.name}
+                  </h3>
+                  {group.description && (
+                    <p className="text-gray-500 text-sm mt-1 line-clamp-2">
+                      {group.description}
+                    </p>
+                  )}
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-xs text-gray-400">
+                      Creado:{" "}
+                      {new Date(group.created_at).toLocaleDateString("es-ES")}
+                    </span>
+                    <div className="flex items-center text-xs text-gray-400">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-4 h-4 mr-1"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                        />
+                      </svg>
+                      Tú
+                    </div>
+                  </div>
+                </Link>
               ))}
+
+              <Link
+                href="/groups/new"
+                className="border border-dashed border-gray-300 rounded-lg p-4 hover:bg-gray-50 transition-colors flex flex-col items-center justify-center text-center min-h-[120px]"
+              >
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6 text-green-700"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                  </svg>
+                </div>
+                <span className="text-green-700 font-medium">
+                  Crear nuevo grupo
+                </span>
+              </Link>
             </div>
           ) : (
             <div className="bg-gray-50 rounded-lg p-8 text-center">
