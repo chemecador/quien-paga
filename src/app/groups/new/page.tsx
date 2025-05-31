@@ -307,36 +307,6 @@ export default function NewGroupPage() {
                   Añadir otro miembro
                 </button>
               </div>
-
-              {/* Settings */}
-              <div>
-                <div className="space-y-4">
-                  <div className="flex items-start">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="equalSplit"
-                        name="equalSplit"
-                        type="checkbox"
-                        checked={formData.equalSplit}
-                        onChange={handleCheckboxChange}
-                        className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                      />
-                    </div>
-                    <div className="ml-3 text-sm">
-                      <label
-                        htmlFor="equalSplit"
-                        className="font-medium text-gray-700"
-                      >
-                        Dividir gastos equitativamente por defecto
-                      </label>
-                      <p className="text-gray-600">
-                        Todos los gastos se dividirán a partes iguales entre los
-                        miembros, a menos que se especifique lo contrario.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div className="mt-10 flex justify-end space-x-3">

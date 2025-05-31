@@ -2,10 +2,12 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
-      <header className="bg-gradient-to-r from-blue-600 to-green-500 text-white shadow-md">
+    <div className="flex flex-col min-h-screen">
+      <header className="bg-emerald-900 text-white shadow-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl text-white font-extrabold">QuienPaga</h1>
+          <h1 className="text-2xl text-white font-extrabold">
+            ¿Quién paga hoy?
+          </h1>
           <nav className="space-x-4">
             <Link href="/sign-in" className="hover:underline">
               Iniciar sesión
@@ -20,24 +22,22 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-grow">
-        <section className="bg-gradient-to-b from-blue-50 to-white py-20">
-          <div className="max-w-6xl mx-auto text-center px-6">
-            <h2 className="text-5xl font-bold mb-4">
-              La forma más fácil de gestionar gastos
-            </h2>
-            <p className="text-xl mb-8">
-              ¿A quién le toca pagar hoy? Nuestro algoritmo calcula quién ha
-              pagado menos gastos y cuánto debe a cada uno.
-            </p>
-            <Link
-              href="/sign-up"
-              className="inline-block px-8 py-4 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700"
-            >
-              Empezar ahora
-            </Link>
-          </div>
-        </section>
+      <main className="flex-grow mt-8">
+        <div className="max-w-6xl mx-auto text-center px-6">
+          <h2 className="text-5xl font-bold mb-4">
+            La forma más fácil de gestionar gastos
+          </h2>
+          <p className="text-xl mb-8">
+            ¿A quién le toca pagar hoy? Nuestro algoritmo calcula quién ha
+            pagado menos gastos y cuánto debe a cada uno.
+          </p>
+          <Link
+            href="/sign-up"
+            className="inline-block px-8 py-4 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700"
+          >
+            Empezar ahora
+          </Link>
+        </div>
 
         <section className="py-16">
           <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 px-6">
@@ -105,15 +105,17 @@ export default function Home() {
                 className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition"
               >
                 <div className="text-blue-600 mb-4">{f.icon}</div>
-                <h3 className="text-xl font-semibold mb-2">{f.title}</h3>
-                <p className="text-gray-600">{f.desc}</p>
+                <h3 className="text-secondary text-xl font-semibold mb-2">
+                  {f.title}
+                </h3>
+                <p className="text-label">{f.desc}</p>
               </div>
             ))}
           </div>
         </section>
       </main>
 
-      <footer className="bg-gray-100 py-6">
+      <footer className="py-6">
         <p className="text-center text-gray-500 text-sm">
           &copy; 2025 QuienPaga. Todos los derechos reservados.
         </p>

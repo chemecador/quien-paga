@@ -17,9 +17,9 @@ export default async function DashboardPage() {
   const groups: Group[] = await getUserGroups(user.id);
 
   return (
-    <div className="p-6 bg-emerald-50 shadow-md rounded-lg">
+    <div className="p-6 bg-emerald-800 shadow-md rounded-lg">
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold text-green-950">
+        <h1 className="text-light text-2xl font-bold">
           Dashboard de Quien Paga
         </h1>
         <UserButton afterSignOutUrl="/" />
@@ -27,11 +27,11 @@ export default async function DashboardPage() {
 
       <main className="space-y-8">
         {/* Sección de bienvenida */}
-        <div className="bg-white shadow rounded-lg p-6 text-black">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className=" bg-emerald-100 shadow rounded-lg p-6 text-black">
+          <h2 className="text-dark text-xl font-semibold mb-4">
             Bienvenido, {user.username || user.firstName || "Usuario"}
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="mb-6">
             Gestiona tus gastos compartidos de forma sencilla. Crea grupos,
             registra gastos y mantén las cuentas claras con tus amigos, familia
             o compañeros.
@@ -62,7 +62,7 @@ export default async function DashboardPage() {
         {/* Sección de grupos */}
         <div className="bg-white shadow rounded-lg p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Mis grupos</h2>
+            <h2 className="text-dark text-xl font-semibold">Mis grupos</h2>
             {groups.length > 0 && (
               <Link
                 href="/groups"
@@ -201,37 +201,6 @@ export default async function DashboardPage() {
               </Link>
             </div>
           )}
-        </div>
-
-        {/* Sección de actividad reciente */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-6">Actividad reciente</h2>
-
-          <div className="bg-gray-50 rounded-lg p-8 text-center">
-            <div className="inline-flex items-center justify-center p-3 bg-blue-100 rounded-full text-blue-600 mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-8 h-8"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium mb-2">
-              No hay actividad reciente
-            </h3>
-            <p className="text-gray-500">
-              La actividad de tus grupos aparecerá aquí cuando comiences a
-              registrar gastos.
-            </p>
-          </div>
         </div>
       </main>
     </div>
