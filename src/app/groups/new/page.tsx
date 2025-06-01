@@ -35,11 +35,6 @@ export default function NewGroupPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: checked }));
-  };
-
   const handleMemberChange = (index: number, value: string) => {
     const newMembers = [...members];
     newMembers[index].name = value;

@@ -1,7 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect, notFound } from "next/navigation";
 import { getGroupById, getGroupMembers } from "@/lib/services/groupService";
-import Link from "next/link";
 import DeleteGroupButton from "./DeleteGroupButton";
 
 export const dynamic = "force-dynamic";
