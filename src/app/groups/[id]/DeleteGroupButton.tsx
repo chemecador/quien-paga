@@ -21,7 +21,7 @@ export default function DeleteGroupButton({
   return (
     <>
       <button
-        className="flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium shadow"
+        className="flex items-center px-3 py-2 bg-red-800 hover:bg-red-500 text-light rounded-md text-sm font-medium shadow cursor-pointer"
         onClick={() => setIsOpen(true)}
       >
         <svg
