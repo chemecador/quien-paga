@@ -2,6 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect, notFound } from "next/navigation";
 import { getGroupById, getGroupMembers } from "@/lib/services/groupService";
 import Link from "next/link";
+import DeleteGroupButton from "./DeleteGroupButton";
 
 export const dynamic = "force-dynamic";
 
@@ -83,6 +84,11 @@ export default async function GroupDetailPage({
                   />
                 </svg>
               </button>
+              <DeleteGroupButton
+                groupId={groupId}
+                groupName={group.name}
+                isAdmin={isAdmin}
+              />
             </div>
           </div>
           {group.description && (

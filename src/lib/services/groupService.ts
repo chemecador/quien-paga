@@ -226,3 +226,56 @@ export async function isUserMemberOfGroup(
     return false;
   }
 }
+
+export async function deleteGroup(
+  groupId: string,
+  userId: string
+): Promise<void> {
+  try {
+    const { data: member, error: memberError } = await supabase
+      .from("members")
+      .select("role")
+      .eq("group_id", groupId)
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .single();
+
+    if (memberError || !member) {
+      throw new Error("No tienes permisos para eliminar este grupo");
+    }
+
+    const { error: expensesError } = await supabase
+      .from("expenses")
+      .delete()
+      .eq("group_id", groupId);
+
+    if (expensesError) {
+      console.error("Error al eliminar gastos:", expensesError);
+    }
+
+    const { error: membersError } = await supabase
+      .from("members")
+      .delete()
+      .eq("group_id", groupId);
+
+    if (membersError) {
+      console.error("Error al eliminar miembros:", membersError);
+      throw new Error(`Error al eliminar miembros: ${membersError.message}`);
+    }
+
+    const { error: groupError } = await supabase
+      .from("groups")
+      .delete()
+      .eq("id", groupId);
+
+    if (groupError) {
+      console.error("Error al eliminar grupo:", groupError);
+      throw new Error(`Error al eliminar grupo: ${groupError.message}`);
+    }
+
+    console.log("Grupo eliminado exitosamente:", groupId);
+  } catch (error) {
+    console.error("Error en deleteGroup:", error);
+    throw error;
+  }
+}
