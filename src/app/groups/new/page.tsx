@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createGroup } from "@/lib/services/groupService";
+import { createGroup, addGroupMembers } from "@/lib/services/groupService";
 import { Group, Member } from "@/lib/types";
 import { useUser } from "@clerk/nextjs";
 
@@ -71,7 +71,7 @@ export default function NewGroupPage() {
         .filter((m) => m.name.trim() !== "")
         .map((m) => ({
           display_name: m.name.trim(),
-          user_id: "",
+          user_id: `temp_${crypto.randomUUID()}`,
           email: "",
           role: "member" as const,
         }));
@@ -96,7 +96,12 @@ export default function NewGroupPage() {
       }
 
       if (validMembers.length > 0) {
-        console.log("Miembros a añadir:", validMembers);
+        const ok = await addGroupMembers(result.id, validMembers);
+        if (!ok) {
+          throw new Error(
+            "Error al añadir los miembros al grupo. Inténtalo de nuevo."
+          );
+        }
       }
 
       router.push("/dashboard");
