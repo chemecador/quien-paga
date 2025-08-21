@@ -185,7 +185,10 @@ export default function ClientGroupDetailPage({
             <div className="space-y-4">
               {expenses.map((expense) => {
                 const paidByMember = members.find(
-                  (m) => m.user_id === expense.paid_by
+                  (m) => m.id === expense.paid_by
+                );
+                const currentUserMember = members.find(
+                  (m) => m.user_id === currentUserId
                 );
                 return (
                   <div
@@ -202,7 +205,8 @@ export default function ClientGroupDetailPage({
                           <span className="font-medium">
                             {paidByMember?.display_name ||
                               "Usuario desconocido"}
-                            {expense.paid_by === currentUserId && " (Tú)"}
+                            {expense.paid_by === currentUserMember?.id &&
+                              " (Tú)"}
                           </span>
                           <span> • </span>
                           <span>
@@ -292,11 +296,6 @@ export default function ClientGroupDetailPage({
                     {member.email && (
                       <p className="text-xs text-gray-500">{member.email}</p>
                     )}
-                    {member.user_id.startsWith("temp_") && (
-                      <p className="text-xs text-orange-600">
-                        Pendiente de registro
-                      </p>
-                    )}
                   </div>
                 </div>
                 <div className="flex items-center">
@@ -305,31 +304,24 @@ export default function ClientGroupDetailPage({
                       Admin
                     </span>
                   )}
-                  {member.user_id.startsWith("temp_") && (
-                    <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">
-                      Pendiente
-                    </span>
+                  {isAdmin && member.user_id !== currentUserId && (
+                    <button className="text-gray-400 hover:text-gray-700 p-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-5 h-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"
+                        />
+                      </svg>
+                    </button>
                   )}
-                  {isAdmin &&
-                    member.user_id !== currentUserId &&
-                    !member.user_id.startsWith("temp_") && (
-                      <button className="text-gray-400 hover:text-gray-700 p-1">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-5 h-5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"
-                          />
-                        </svg>
-                      </button>
-                    )}
                 </div>
               </div>
             ))}
@@ -340,12 +332,10 @@ export default function ClientGroupDetailPage({
       <AddExpenseModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        members={members
-          .filter((m) => !m.user_id.startsWith("temp_"))
-          .map((m) => ({
-            id: m.user_id,
-            display_name: m.display_name || "Usuario sin nombre",
-          }))}
+        members={members.map((m) => ({
+          id: m.id,
+          display_name: m.display_name || "Usuario sin nombre",
+        }))}
         groupId={groupId}
         onExpenseAdded={handleExpenseAdded}
       />
