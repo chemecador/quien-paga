@@ -5,6 +5,7 @@ import DeleteGroupButton from "./DeleteGroupButton";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getGroupExpenses, Expense } from "@/lib/services/expenseService";
+import { addMemberToGroupAction } from "@/app/actions/addMemberAction";
 
 interface Group {
   id: string;
@@ -34,6 +35,8 @@ export default function ClientGroupDetailPage({
   currentUserId,
 }: ClientGroupDetailPageProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
+  const [newMemberName, setNewMemberName] = useState("");
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loadingExpenses, setLoadingExpenses] = useState(true);
   const router = useRouter();
@@ -60,6 +63,26 @@ export default function ClientGroupDetailPage({
   const handleExpenseAdded = () => {
     loadExpenses();
     router.refresh();
+  };
+
+  const handleAddMember = async () => {
+    if (!newMemberName.trim()) return;
+
+    try {
+      await addMemberToGroupAction({
+        groupId,
+        displayName: newMemberName.trim(),
+        email: "", // Email vacío por ahora
+      });
+
+      // Limpiar el formulario y cerrar modal
+      setNewMemberName("");
+      setAddMemberModalOpen(false); // Recargar la página para mostrar el nuevo miembro
+      router.refresh();
+    } catch (error) {
+      console.error("Error al añadir miembro:", error);
+      alert("Error al añadir miembro. Por favor, inténtalo de nuevo.");
+    }
   };
 
   return (
@@ -245,7 +268,10 @@ export default function ClientGroupDetailPage({
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-medium text-gray-900">Miembros</h2>
             {isAdmin && (
-              <button className="text-green-600 hover:text-green-700 flex items-center text-sm font-medium">
+              <button
+                className="text-green-600 hover:text-green-700 flex items-center text-sm font-medium"
+                onClick={() => setAddMemberModalOpen(true)}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -260,7 +286,7 @@ export default function ClientGroupDetailPage({
                     d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
                   />
                 </svg>
-                Invitar
+                Añadir miembro
               </button>
             )}
           </div>
@@ -339,6 +365,48 @@ export default function ClientGroupDetailPage({
         groupId={groupId}
         onExpenseAdded={handleExpenseAdded}
       />
+
+      {/* Modal para añadir miembro */}
+      {addMemberModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-medium mb-4 text-gray-900">
+              Añadir nuevo miembro
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+                  placeholder="Nombre del miembro"
+                  value={newMemberName}
+                  onChange={(e) => setNewMemberName(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                onClick={() => {
+                  setNewMemberName("");
+                  setAddMemberModalOpen(false);
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                onClick={handleAddMember}
+              >
+                Añadir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
