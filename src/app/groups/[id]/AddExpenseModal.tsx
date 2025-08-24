@@ -24,7 +24,7 @@ export default function AddExpenseModal({
   onExpenseAdded,
 }: AddExpenseModalProps) {
   const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState("");
   const [paidBy, setPaidBy] = useState(members[0]?.id || "");
   const [splitType, setSplitType] = useState<"equal" | "custom">("equal");
   const [customShares, setCustomShares] = useState<
@@ -38,7 +38,8 @@ export default function AddExpenseModal({
   const handleSplitTypeChange = (type: "equal" | "custom") => {
     setSplitType(type);
     if (type === "equal") {
-      const equalAmount = amount / members.length;
+      const amountNum = parseFloat(amount) || 0;
+      const equalAmount = amountNum / members.length;
       setCustomShares(
         members.map((m) => ({
           userId: m.id,
@@ -49,7 +50,7 @@ export default function AddExpenseModal({
   };
 
   const handleAmountChange = (value: number) => {
-    setAmount(value);
+    setAmount(value.toString());
     if (splitType === "equal") {
       const equalAmount = value / members.length;
       setCustomShares(
@@ -62,11 +63,18 @@ export default function AddExpenseModal({
   };
 
   const handleCustomShareChange = (userId: string, value: number) => {
-    setCustomShares((prev) =>
-      prev.map((share) =>
-        share.userId === userId ? { ...share, amount: value } : share
-      )
+    const newShares = customShares.map((share) =>
+      share.userId === userId ? { ...share, amount: value } : share
     );
+    setCustomShares(newShares);
+
+    if (splitType === "custom") {
+      const totalAmount = newShares.reduce(
+        (sum, share) => sum + share.amount,
+        0
+      );
+      setAmount(totalAmount.toString());
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,7 +94,7 @@ export default function AddExpenseModal({
       await createExpenseAction({
         groupId,
         description,
-        amount,
+        amount: parseFloat(amount) || 0,
         paidBy,
         shares: customShares,
       });
@@ -94,7 +102,7 @@ export default function AddExpenseModal({
       onExpenseAdded();
       onClose();
       setDescription("");
-      setAmount(0);
+      setAmount("");
       setPaidBy(members[0]?.id || "");
       setSplitType("equal");
       setCustomShares(members.map((m) => ({ userId: m.id, amount: 0 })));
@@ -133,8 +141,8 @@ export default function AddExpenseModal({
               type="number"
               className="w-full border rounded px-3 py-2 text-dark"
               value={amount}
-              min={0.01}
-              step={0.01}
+              min={0}
+              step={1}
               onChange={(e) => handleAmountChange(Number(e.target.value))}
               required
             />
@@ -185,7 +193,7 @@ export default function AddExpenseModal({
                       className="border rounded px-2 py-1 w-28 text-dark"
                       value={customShares[idx]?.amount || 0}
                       min={0}
-                      step={0.01}
+                      step={1}
                       onChange={(e) =>
                         handleCustomShareChange(m.id, Number(e.target.value))
                       }
