@@ -122,7 +122,8 @@ export default function ClientGroupDetailPage({
 
         {/* Resumen del grupo */}
         <div className="px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <h2 className="text-lg font-medium text-gray-900">Balance</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="text-sm text-gray-500 mb-1">Balance total</h3>
               <p className="text-2xl font-bold text-gray-900">
@@ -155,27 +156,62 @@ export default function ClientGroupDetailPage({
             </div>
           </div>
         </div>
+
+        {/* Desglose de balances por miembro */}
+        <div className="px-8 pb-6">
+          <h3 className="text-md font-medium text-gray-900 mb-4">
+            Desglose por miembro
+          </h3>
+          <div className="space-y-3">
+            {members.map((member) => {
+              const memberBalance = expenses.reduce((balance, expense) => {
+                if (expense.paid_by === member.id) {
+                  balance += expense.amount;
+                }
+                const memberShare = expense.shares.find(
+                  (share) => share.userId === member.id
+                );
+                if (memberShare) {
+                  balance -= memberShare.amount;
+                }
+                return balance;
+              }, 0);
+
+              return (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                >
+                  <div className="flex items-center">
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {member.display_name || "Usuario sin nombre"}
+                        {member.user_id === currentUserId && " (Tú)"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p
+                      className={`font-semibold ${
+                        memberBalance >= 0 ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      {memberBalance >= 0 ? "+" : ""}
+                      {memberBalance.toFixed(2)} €
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {memberBalance >= 0 ? "Le deben" : "Debe"}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Contenido principal - Tabs */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
-        <div className="border-b border-gray-200">
-          <nav className="flex -mb-px">
-            <a
-              href="#"
-              className="border-b-2 border-green-500 py-4 px-6 text-sm font-medium text-green-600"
-            >
-              Gastos
-            </a>
-            <a
-              href="#"
-              className="border-b-2 border-transparent hover:border-gray-300 py-4 px-6 text-sm font-medium text-gray-500 hover:text-gray-700"
-            >
-              Balances
-            </a>
-          </nav>
-        </div>
-
         {/* Lista de gastos */}
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
