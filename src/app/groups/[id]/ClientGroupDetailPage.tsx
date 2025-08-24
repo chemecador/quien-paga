@@ -64,6 +64,24 @@ export default function ClientGroupDetailPage({
     loadExpenses();
     router.refresh();
   };
+  const totalBalance = expenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
+
+  const currentUserMember = members.find((m) => m.user_id === currentUserId);
+  const userBalance = expenses.reduce((balance, expense) => {
+    if (expense.paid_by === currentUserMember?.id) {
+      balance += expense.amount;
+    }
+    const userShare = expense.shares.find(
+      (share) => share.userId === currentUserMember?.id
+    );
+    if (userShare) {
+      balance -= userShare.amount;
+    }
+    return balance;
+  }, 0);
 
   const handleAddMember = async () => {
     if (!newMemberName.trim()) return;
@@ -72,12 +90,11 @@ export default function ClientGroupDetailPage({
       await addMemberToGroupAction({
         groupId,
         displayName: newMemberName.trim(),
-        email: "", // Email vacío por ahora
+        email: "",
       });
 
-      // Limpiar el formulario y cerrar modal
       setNewMemberName("");
-      setAddMemberModalOpen(false); // Recargar la página para mostrar el nuevo miembro
+      setAddMemberModalOpen(false);
       router.refresh();
     } catch (error) {
       console.error("Error al añadir miembro:", error);
@@ -108,15 +125,26 @@ export default function ClientGroupDetailPage({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="text-sm text-gray-500 mb-1">Balance total</h3>
-              <p className="text-2xl font-bold text-gray-900">0.00 €</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {totalBalance.toFixed(2)} €
+              </p>
               <p className="text-sm text-gray-500 mt-1">
                 Importe de todos los gastos
               </p>
             </div>
             <div className="bg-green-50 rounded-lg p-4">
               <h3 className="text-sm text-gray-500 mb-1">Tu balance</h3>
-              <p className="text-2xl font-bold text-green-600">0.00 €</p>
-              <p className="text-sm text-gray-500 mt-1">Estás al día</p>
+              <p
+                className={`text-2xl font-bold ${
+                  userBalance >= 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {userBalance >= 0 ? "+" : ""}
+                {userBalance.toFixed(2)} €
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                {userBalance >= 0 ? "Te deben dinero" : "Debes dinero"}
+              </p>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="text-sm text-gray-500 mb-1">Miembros</h3>
@@ -144,12 +172,6 @@ export default function ClientGroupDetailPage({
               className="border-b-2 border-transparent hover:border-gray-300 py-4 px-6 text-sm font-medium text-gray-500 hover:text-gray-700"
             >
               Balances
-            </a>
-            <a
-              href="#"
-              className="border-b-2 border-transparent hover:border-gray-300 py-4 px-6 text-sm font-medium text-gray-500 hover:text-gray-700"
-            >
-              Miembros
             </a>
           </nav>
         </div>
