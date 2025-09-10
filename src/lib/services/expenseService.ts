@@ -100,3 +100,29 @@ export async function getGroupExpenses(groupId: string): Promise<Expense[]> {
     ),
   }));
 }
+
+export interface Transfer {
+  id: string;
+  group_id: string;
+  from_user_id: string;
+  to_user_id: string;
+  amount: number;
+  description: string;
+  created_at: string;
+  created_by: string;
+}
+
+export async function getGroupTransfers(groupId: string): Promise<Transfer[]> {
+  const { data: transfers, error } = await supabase
+    .from("transfers")
+    .select("*")
+    .eq("group_id", groupId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching transfers:", error);
+    return [];
+  }
+
+  return transfers || [];
+}

@@ -1,10 +1,16 @@
 "use client";
 
 import AddExpenseModal from "./AddExpenseModal";
+import AddTransferModal from "./AddTransferModal";
 import DeleteGroupButton from "./DeleteGroupButton";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getGroupExpenses, Expense } from "@/lib/services/expenseService";
+import {
+  getGroupExpenses,
+  getGroupTransfers,
+  Expense,
+  Transfer,
+} from "@/lib/services/expenseService";
 import { addMemberToGroupAction } from "@/app/actions/addMemberAction";
 
 interface Group {
@@ -35,10 +41,13 @@ export default function ClientGroupDetailPage({
   currentUserId,
 }: ClientGroupDetailPageProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [transferModalOpen, setTransferModalOpen] = useState(false);
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
   const [newMemberName, setNewMemberName] = useState("");
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [transfers, setTransfers] = useState<Transfer[]>([]);
   const [loadingExpenses, setLoadingExpenses] = useState(true);
+  const [loadingTransfers, setLoadingTransfers] = useState(true);
   const router = useRouter();
 
   const isAdmin =
@@ -56,12 +65,34 @@ export default function ClientGroupDetailPage({
     }
   };
 
-  useEffect(() => {
+  const loadTransfers = async () => {
+    setLoadingTransfers(true);
+    try {
+      const groupTransfers = await getGroupTransfers(groupId);
+      setTransfers(groupTransfers);
+    } catch (error) {
+      console.error("Error loading transfers:", error);
+    } finally {
+      setLoadingTransfers(false);
+    }
+  };
+
+  const loadData = () => {
     loadExpenses();
+    loadTransfers();
+  };
+
+  useEffect(() => {
+    loadData();
   }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleExpenseAdded = () => {
-    loadExpenses();
+    loadData();
+    router.refresh();
+  };
+
+  const handleTransferAdded = () => {
+    loadData();
     router.refresh();
   };
   const totalBalance = expenses.reduce(
@@ -70,18 +101,29 @@ export default function ClientGroupDetailPage({
   );
 
   const currentUserMember = members.find((m) => m.user_id === currentUserId);
-  const userBalance = expenses.reduce((balance, expense) => {
-    if (expense.paid_by === currentUserMember?.id) {
-      balance += expense.amount;
-    }
-    const userShare = expense.shares.find(
-      (share) => share.userId === currentUserMember?.id
-    );
-    if (userShare) {
-      balance -= userShare.amount;
-    }
-    return balance;
-  }, 0);
+
+  const userBalance =
+    expenses.reduce((balance, expense) => {
+      if (expense.paid_by === currentUserMember?.id) {
+        balance += expense.amount;
+      }
+      const userShare = expense.shares.find(
+        (share) => share.userId === currentUserMember?.id
+      );
+      if (userShare) {
+        balance -= userShare.amount;
+      }
+      return balance;
+    }, 0) +
+    transfers.reduce((balance, transfer) => {
+      if (transfer.from_user_id === currentUserMember?.id) {
+        balance += transfer.amount;
+      }
+      if (transfer.to_user_id === currentUserMember?.id) {
+        balance -= transfer.amount;
+      }
+      return balance;
+    }, 0);
 
   const handleAddMember = async () => {
     if (!newMemberName.trim()) return;
@@ -164,18 +206,28 @@ export default function ClientGroupDetailPage({
           </h3>
           <div className="space-y-3">
             {members.map((member) => {
-              const memberBalance = expenses.reduce((balance, expense) => {
-                if (expense.paid_by === member.id) {
-                  balance += expense.amount;
-                }
-                const memberShare = expense.shares.find(
-                  (share) => share.userId === member.id
-                );
-                if (memberShare) {
-                  balance -= memberShare.amount;
-                }
-                return balance;
-              }, 0);
+              const memberBalance =
+                expenses.reduce((balance, expense) => {
+                  if (expense.paid_by === member.id) {
+                    balance += expense.amount;
+                  }
+                  const memberShare = expense.shares.find(
+                    (share) => share.userId === member.id
+                  );
+                  if (memberShare) {
+                    balance -= memberShare.amount;
+                  }
+                  return balance;
+                }, 0) +
+                transfers.reduce((balance, transfer) => {
+                  if (transfer.from_user_id === member.id) {
+                    balance += transfer.amount;
+                  }
+                  if (transfer.to_user_id === member.id) {
+                    balance -= transfer.amount;
+                  }
+                  return balance;
+                }, 0);
 
               return (
                 <div
@@ -320,6 +372,120 @@ export default function ClientGroupDetailPage({
         </div>
       </div>
 
+      {/* Lista de transferencias */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-medium text-gray-900">
+              Transferencias
+            </h2>
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+              onClick={() => setTransferModalOpen(true)}
+            >
+              Nueva transferencia
+            </button>
+          </div>
+
+          {/* Lista de transferencias */}
+          {loadingTransfers ? (
+            <div className="text-center py-12">
+              <div className="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full" />
+              <p className="mt-2 text-gray-500">Cargando transferencias...</p>
+            </div>
+          ) : transfers.length === 0 ? (
+            <div className="text-center py-12 border border-dashed border-gray-300 rounded-lg bg-gray-50">
+              <div className="inline-flex items-center justify-center p-3 bg-blue-100 rounded-full text-blue-600 mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-8 h-8"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium mb-2 text-gray-900">
+                No hay transferencias todavía
+              </h3>
+              <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                Las transferencias te permiten saldar deudas entre miembros del
+                grupo.
+              </p>
+              <button
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+                onClick={() => setTransferModalOpen(true)}
+              >
+                Nueva transferencia
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {transfers.map((transfer) => {
+                const fromMember = members.find(
+                  (m) => m.id === transfer.from_user_id
+                );
+                const toMember = members.find(
+                  (m) => m.id === transfer.to_user_id
+                );
+                return (
+                  <div
+                    key={transfer.id}
+                    className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900">
+                          {transfer.description}
+                        </h4>
+                        <div className="mt-1 text-sm text-gray-500">
+                          <span className="font-medium">
+                            {fromMember?.display_name || "Usuario desconocido"}
+                            {transfer.from_user_id === currentUserMember?.id &&
+                              " (Tú)"}
+                          </span>
+                          <span> → </span>
+                          <span className="font-medium">
+                            {toMember?.display_name || "Usuario desconocido"}
+                            {transfer.to_user_id === currentUserMember?.id &&
+                              " (Tú)"}
+                          </span>
+                          <span> • </span>
+                          <span>
+                            {new Date(transfer.created_at).toLocaleDateString(
+                              "es-ES",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              }
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-semibold text-blue-600">
+                          {transfer.amount.toFixed(2)} €
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Transferencia
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Lista de miembros */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
         <div className="p-6">
@@ -412,6 +578,19 @@ export default function ClientGroupDetailPage({
           </div>
         </div>
       </div>
+
+      <AddTransferModal
+        open={transferModalOpen}
+        onClose={() => setTransferModalOpen(false)}
+        members={members.map((m) => ({
+          id: m.id,
+          display_name: m.display_name || "Usuario sin nombre",
+          user_id: m.user_id,
+        }))}
+        groupId={groupId}
+        onTransferAdded={handleTransferAdded}
+        currentUserId={currentUserId}
+      />
 
       <AddExpenseModal
         open={modalOpen}

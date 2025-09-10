@@ -16,7 +16,6 @@ export async function addMemberToGroupAction({
   const user = await currentUser();
   if (!user) throw new Error("Usuario no autenticado");
 
-  // Verificar que el usuario actual es admin del grupo
   const { data: currentMember } = await supabase
     .from("members")
     .select("role")
@@ -28,16 +27,15 @@ export async function addMemberToGroupAction({
     throw new Error("No tienes permisos para añadir miembros a este grupo");
   }
 
-  // Crear el nuevo miembro
   const { data: newMember, error } = await supabase
     .from("members")
     .insert([
       {
         id: uuidv4(),
         group_id: groupId,
-        user_id: "", // Para MVP, los miembros no tienen user_id real
+        user_id: "",
         display_name: displayName,
-        email: email, // Ahora siempre es string (puede estar vacío)
+        email: email,
         role: "member",
       },
     ])
